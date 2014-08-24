@@ -35,7 +35,7 @@ Example CSV Coords
 			ui.tsp.startOver();
 
 			for(var i = 0; i < length; i+=2) {
-				ui.tsp.addWaypoint(new google.maps.LatLng(directions[i], directions[i+1]));
+				ui.tsp.addWaypoint(new google.maps.LatLng(directions[i+1], directions[i]));
 			}
 
 			console.log('Solving Route...');

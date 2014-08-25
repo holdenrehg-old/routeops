@@ -1271,7 +1271,7 @@ Example CSV Coords
 			ui.tsp.startOver();
 
 			for(var i = 0; i < length; i+=2) {
-				ui.tsp.addWaypoint(new google.maps.LatLng(directions[i], directions[i+1]));
+				ui.tsp.addWaypoint(new google.maps.LatLng(directions[i+1], directions[i]));
 			}
 
 			console.log('Solving Route...');
@@ -1290,4 +1290,5 @@ Example CSV Coords
 })(
 	require('../google-maps-tsp-solver-read-only/BpTspSolver.js')
 );
+
 },{"../google-maps-tsp-solver-read-only/BpTspSolver.js":1}]},{},[2,1]);

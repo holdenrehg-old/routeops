@@ -627,6 +627,7 @@
     function nextChunk(mode) {
         var percentage = (okChunkNode / wayArr.length) * 100;
         if(percentage > currentPercentage) {
+            percentage = percentage > 100 ? 100 : percentage;
             logger.info(percentage.toString().split('.')[0] + '%');
             currentPercentage = percentage;
         }

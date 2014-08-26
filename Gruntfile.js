@@ -5,16 +5,16 @@ module.exports = function(grunt) {
     // concat js together
     browserify: {
   		'app.js': [
-  			'js/test.js',
-  			'google-maps-tsp-solver-read-only/BpTspSolver.js'
+  			'js/*.js',
+  			'google-maps-tsp-solver-read-only/*.js'
   		]
     },
 
     // watch task for js file changes
     watch: {
       files: [ 
-        'js/test.js',
-        'google-maps-tsp-solver-read-only/BpTspSolver.js'
+        'js/*.js',
+        'google-maps-tsp-solver-read-only/*.js'
       ],
       tasks: [ 'browserify' ]
     }

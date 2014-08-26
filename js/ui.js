@@ -5,7 +5,7 @@ Example CSV Coords
 
 */
 
-(function(BpTspSolver) {
+(function(BpTspSolver, logger) {
 
 	var ui = {
 
@@ -28,8 +28,15 @@ Example CSV Coords
 		},
 
 		onSubmit: function(event) {
-			var directions = document.getElementById('directions').value.split(','),
+			var csvArea = document.getElementById('directions'),
+				loading = document.getElementById('loading'),
+				directions = csvArea.value.split(','),
 				length = directions.length;
+
+			event.target.disabled = true;
+			loading.style.display = 'inline';
+			csvArea.disabled = true;
+			csvArea.value = '';
 
 			ui.tsp.clearDirections();
 			ui.tsp.startOver();
@@ -38,19 +45,27 @@ Example CSV Coords
 				ui.tsp.addWaypoint(new google.maps.LatLng(directions[i+1], directions[i]));
 			}
 
-			console.log('Solving Route...');
+			logger.info('Solving Route For ' + directions.length / 2 + ' Points...');
+			logger.info('');
 			var start = new Date().getTime() / 1000;
 			ui.tsp.solveRoundTrip(function() {
 				var stop = new Date().getTime() / 1000;
 				ui.tsp.renderDirections(ui.map);
 				
-				console.log('Calculated in ' + (stop - start) + ' seconds');
-				console.log(' ');
+				logger.info('Calculated in ' + (stop - start) + ' seconds');
+
+				// reset form
+				event.target.disabled = false;
+				loading.style.display = 'none';
+				csvArea.disabled = false;
+				logger.info('');
+				logger.info('Done!');
 			});
 		}
 	};
 
-	ui.init();
+	module.exports = ui;
 })(
-	require('../google-maps-tsp-solver-read-only/BpTspSolver.js')
+	require('../google-maps-tsp-solver-read-only/BpTspSolver.js'),
+	require('./logger.js')
 );

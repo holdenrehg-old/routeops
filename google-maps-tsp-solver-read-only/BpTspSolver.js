@@ -15,15 +15,14 @@
   See http://code.google.com/p/google-maps-tsp-solver/
 */
 
-(function() {
-
+(function(logger) {
     var tsp; // singleton
     var gebMap; // The map DOM object
     var directionsPanel; // The driving directions DOM object
     var gebDirectionsResult; // The driving directions returned from GMAP API
     var gebDirectionsService;
     var gebGeocoder; // The geocoder for addresses
-    var maxTspSize = 100; // A limit on the size of the problem, mostly to save Google servers from undue load.
+    var maxTspSize = 1000000; // A limit on the size of the problem, mostly to save Google servers from undue load.
     var maxTspBF = 0; // Max size for brute force, may seem conservative, but ma
     var maxTspDynamic = 15; // Max size for brute force, may seem conservative, but many browsers have limitations on run-time.
     var maxSize = 10; // Max number of waypoints in one Google driving directions request.
@@ -42,6 +41,7 @@
     var addressRequests = 0;
     var addressProcessing = false;
     var requestNum = 0;
+    var totalRequests = 0;
     var currQueueNum = 0;
     var wayArr;
     var legsTmp;
@@ -66,6 +66,7 @@
     var cachedDirections = false;
     var requestLimitWait = 1000;
     var fakeDirResult; // Object used to store travel info like travel mode etc. Needed for route renderer.
+    var currentPercentage = 0; // percentage done calculating
 
     var onSolveCallback = function() {};
     var onProgressCallback = null;
@@ -623,7 +624,11 @@
     }
 
     function nextChunk(mode) {
-        //  alert("nextChunk");
+        var percentage = (okChunkNode / wayArr.length) * 100;
+        if(percentage > currentPercentage) {
+            logger.info(percentage.toString().split('.')[0] + '%');
+            currentPercentage = percentage;
+        }
         chunkNode = okChunkNode;
         if (chunkNode < wayArr.length) {
             var wayArrChunk = new Array();
@@ -655,6 +660,8 @@
                     travelMode: travelMode
                 },
                 function(directionsResult, directionsStatus) {
+                    console.log(' --- Directions Service Route Calculated');
+                    console.log(' --- Total Requests ' + (++totalRequests));
                     if (directionsStatus == google.maps.DirectionsStatus.OK) {
                         requestLimitWait = 1000;
                         //alert("Request completed!");
@@ -671,8 +678,9 @@
                         }
                         okChunkNode = chunkNode;
                         nextChunk(mode);
-                    } else if (directionsStatus == google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
-                        requestLimitWait *= 2;
+                    } else if (directionsStatus === google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
+                        // requestLimitWait *= 2;
+                        console.log('Waiting ' + (requestLimitWait / 1000.0) + ' Second(s)...');
                         setTimeout(function() {
                             nextChunk(mode)
                         }, requestLimitWait);
@@ -688,7 +696,6 @@
     }
 
     function readyTsp(mode) {
-        //alert("readyTsp");
         // Get distances and durations into 2-d arrays:
         distIndex = 0;
         legs = new Array();
@@ -1089,7 +1096,8 @@
     };
 
     BpTspSolver.prototype.renderDirections = function(map) {
-        console.log('rendering directions');
+        logger.info(' ');
+        logger.info('Rendering directions');
         this.renderer = new google.maps.DirectionsRenderer();
         this.renderer.setMap(map);
         this.renderer.setDirections(tsp.getGDirections());
@@ -1168,6 +1176,7 @@
             onSolveCallback = callback;
 
         directions(0);
+        totalRequests = 0;
     };
 
     BpTspSolver.prototype.solveAtoZ = function(callback) {
@@ -1228,6 +1237,7 @@
     }
 
     window.BpTspSolver = BpTspSolver;
-    module.exports = BpTspSolver
-
-})();
+    module.exports = BpTspSolver;
+})(
+    require('../js/logger.js')
+);

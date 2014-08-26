@@ -624,10 +624,10 @@
     }
 
     function nextChunk(mode) {
-        var percentage = (okChunkNode / wayArr.length) * 100;
-        if(percentage > currentPercentage) {
+        var percentage = ((okChunkNode / wayArr.length) * 100);
+        if(Number(percentage.toFixed(1)) > Number(currentPercentage.toFixed(1))) {
             percentage = percentage > 100 ? 100 : percentage;
-            logger.info(percentage.toString().split('.')[0] + '%');
+            logger.info(percentage.toFixed(1) + '%');
             currentPercentage = percentage;
         }
         chunkNode = okChunkNode;

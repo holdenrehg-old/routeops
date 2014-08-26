@@ -1179,6 +1179,7 @@
 
         directions(0);
         totalRequests = 0;
+        currentPercentage = 0;
     };
 
     BpTspSolver.prototype.solveAtoZ = function(callback) {
